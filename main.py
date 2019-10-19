@@ -1,8 +1,10 @@
 # main file
 
+import nltk
 from format import buildData
 from utils import SO_objects as SO
 from nltk.tokenize import word_tokenize
+
 
 """ 1. Import and clean training data """
 
@@ -31,3 +33,8 @@ for q in querry:
 all_words = []
 for p in dataset:
     all_words.extend(p.bagOfWords())
+
+all_words = nltk.FreqDist(all_words) #get the frequency distribution of all used words.
+
+n_features = 2000
+features = list(all_words.keys())[:2000]
