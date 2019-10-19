@@ -7,8 +7,8 @@ def buildPostsDf(xml):
     One DataFrame for querries (with title) and one for posts."""
 
     root = xml.getroot()
-    querry_cols = ['PostTypeId', 'acceptedAnswerId', 'Text', 'Title', 'CommentCount', 'AnswerCount'] #Columns selected
-    posts_cols = ['ParentId', 'Score', 'Body']
+    querry_cols = ['PostTypeId', 'acceptedAnswerId', 'Body', 'Title', 'Tags', 'AnswerCount', 'Score', 'CommentCount'] #Columns selected
+    posts_cols = ['ParentId', 'Score', 'Body', 'Tags']
     querry_df = pd.DataFrame(columns=querry_cols)
     posts_df = pd.DataFrame(columns=posts_cols)
 

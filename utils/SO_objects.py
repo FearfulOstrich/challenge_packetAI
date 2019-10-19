@@ -63,7 +63,7 @@ class Post(object):
         - Score
         - Tags"""
 
-    def __init__(self, id, body, score, tags, comments):
+    def __init__(self, id, body, tags, score):
         self.body = body
         self.id = id
         self.score = score
@@ -105,7 +105,7 @@ class Querry(Post):
     def __init__(self, id, body, score, tags, title, answerId):
         self.title = title
         self.answer_id = answerId
-        self.querry_post = Post.__init__(id, body, score, tags)
+        self.querry_post = Post.__init__(id, body, tags, score)
 
 
     def cleanTitle(self):
