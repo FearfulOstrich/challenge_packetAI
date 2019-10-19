@@ -1,33 +1,52 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
+import utils.SO_objects as SO
 
-def build_posts_df(xml):
-    """Function to create a Series from the xml posts object."""
+def buildPostsDf(xml):
+    """Function to create a DataFrames from the xml posts object.
+    One DataFrame for querries (with title) and one for posts."""
 
     root = xml.getroot()
-    cols = ['PostTypeId', 'acceptedAnswerId', 'Text', 'Title', 'CommentCount', 'AnswerCount'] #Columns selected
-    main_posts = pd.DataFrame(columns=cols)
-    other_posts = pd.Dataframe(columns=['ParentId', 'Score', 'Body'])
+    querry_cols = ['PostTypeId', 'acceptedAnswerId', 'Text', 'Title', 'CommentCount', 'AnswerCount'] #Columns selected
+    posts_cols = ['ParentId', 'Score', 'Body']
+    querry_df = pd.DataFrame(columns=querry_cols)
+    posts_df = pd.DataFrame(columns=posts_cols)
+
     for p in root:
         if p.attrib.get("PostTypeId")=="1":
             id = p.attrib.get("Id")
-            row = dict(zip(cols, [p.attrib.get(a) for a in cols]))
+            row = dict(zip(querry_cols, [p.attrib.get(a) for a in querry_cols]))
             row_s = pd.Series(row)
             row_s.name = id
-            posts = posts.append(row_s)
+            querry_df = querry_df.append(row_s)
 
-    return main_posts, other_posts
+        elif p.attrib.get("PostTypeId")=="2":
+            id = p.attrib.get("Id")
+            row = dict(zip(posts_cols, [p.attrib.get(a) for a in posts_cols]))
+            row_s = pd.Series(row)
+            row_s.name = id
+            posts_df = querry_df.append(row_s)
 
-def append_comments(xml, posts):
-    """Function to append comments to the posts df.
-    Selects accepted answer to a separate column."""
+    return querry_df, posts_df
+
+def buildCommentsDf(xml):
+    """Function to create a Dataframe from the xml comments objects."""
 
     root = xml.getroot()
-    cols = ['']
-    comments = pd.DataFrame(columns=cols)
+    cols = ['PostId', 'Score', 'Text']
+    comments_df = pd.DataFrame(columns=cols)
+
+    for c in root:
+        id = c.attrib.get("Id")
+        row = dict(zip(cols, [c.attrib.get(a) for a in cols]))
+        row_s = pd.Series(row)
+        row_s.name = id
+        comments_df.append(row_s)
+
+    return comments_df
 
 
-def build_data(dirname):
+def buildData(dirname):
     """Function to build the data from stack overflow xml files.
     Takes posts and matches all comments corresponding to the post id."""
 
@@ -36,5 +55,7 @@ def build_data(dirname):
     xml_posts = ET.parse(fposts)
     xml_comments = ET.parse(fcomments)
 
-    posts_df = build_posts_df(xml_posts)
+    querry_df, posts_df = build_posts_df(xml_posts)
     comments_df = append_comments(xml_comments, posts_df)
+
+    return querry_df, posts_df, comments_df
