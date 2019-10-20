@@ -55,7 +55,7 @@ def buildData(dirname):
     xml_posts = ET.parse(fposts)
     xml_comments = ET.parse(fcomments)
 
-    querry_df, posts_df = build_posts_df(xml_posts)
-    comments_df = append_comments(xml_comments, posts_df)
+    querry_df, posts_df = buildPostsDf(xml_posts)
+    comments_df = buildCommentsDf(xml_comments)
 
     return querry_df, posts_df, comments_df

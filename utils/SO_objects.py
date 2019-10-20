@@ -105,16 +105,16 @@ class Querry(Post):
     def __init__(self, id, body, score, tags, title, answerId):
         self.title = title
         self.answer_id = answerId
-        self.querry_post = Post.__init__(id, body, tags, score)
+        self.querry_post = Post(id, body, tags, score)
 
 
     def cleanTitle(self):
         "Function to clean the body of the post."
         self.clean_title = stopWordsStemming(regexReplacement(self.title))
 
-    # def cleanBody(self):
-    #     "Function to clean the body of the querry"
-    #     self.clean_body = stopWordsStemming(regexReplacement(self.body))
+    def cleanBody(self):
+        "Function to clean the body of the querry"
+        self.querry_post.cleanBody()
 
     def cleanQuerry(self):
         """Function to clean the entire querry (title+body)"""
@@ -154,9 +154,13 @@ class Page(object):
 
     def __init__(self):
         self.posts = []
+        self.answer_flag = 0
 
     def addPost(self, post):
         self.posts.append(post)
+        if post.id == self.querry.answer_id:
+            self.answer = post.body
+            self.answer_flag = 1
 
     def addQuerry(self, querry):
         self.querry = querry
@@ -169,12 +173,15 @@ class Page(object):
     def cleanPage(self):
         """Function to clean the entire page (querry (title + body) + posts (body + comments))"""
         self.querry.cleanQuerry()
+        if self.answer_flag:
+            self.clean_answer = stopWordsStemming(regexReplacement(self.answer))
         self.cleanPosts()
 
     def bagOfWords(self):
         """Get all the words that appear in a clean page."""
         self.bow = []
-        self.bow.append(self.querry.bagOfWords())
+        self.bow.extend(self.querry.bagOfWords())
+        self.bow.extend(self.clean_answer.split())
         for post in self.posts:
             self.bow.extend(post.bagOfWords())
 
